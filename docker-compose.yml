@@ -1,21 +1,25 @@
 version: '3.9'
 name: virtual
 services:
+  ####SERVICE####
   code:
     container_name: bun
     hostname: bun
     build:
       dockerfile: ./bun/Dockerfile
+    mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
+    cpus: $AWS_T3_NANO_CPUS
     ports:
       - 8080:8080
     networks:
       - backend
+
+  ####SERVICE####
   database:
     container_name: postgresql
     hostname: postgresql
     build:
       dockerfile: ./postgresql/Dockerfile
-    restart: always
     environment:
       - PGUSER=$POSTGRES_USER
       - POSTGRES_USER=$POSTGRES_USER
@@ -25,6 +29,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
+    mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
+    cpus: $AWS_T3_NANO_CPUS
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -33,11 +45,18 @@ services:
       - code
     networks:
       - backend
+
+  ####SERVICE####
   database-gui:
     container_name: pgadmin
     hostname: pgadmin
     image: dpage/pgadmin4:latest
-    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 2
+        window: 180s
     environment:
       - PGADMIN_DEFAULT_EMAIL=$PGADMIN_DEFAULT_EMAIL
       - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_DEFAULT_PASSWORD
@@ -48,11 +67,18 @@ services:
       - database
     networks:
       - backend
+
+  ####SERVICE####
   cache:
     container_name: redis
     hostname: redis
     image: redis:7.2
-    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 10
+        window: 60s
     ports:
       - "6379:6379"
     volumes:
@@ -64,12 +90,19 @@ services:
       - REDIS_DATABASES=$REDIS_DATABASES
     networks:
       - backend
+
+  ####SERVICE####
   cache-gui:
     container_name: redis-commander
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     build: .
-    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 2
+        window: 180s
     environment:
     - REDIS_HOSTS=$REDIS_HOSTS
     ports:
@@ -79,11 +112,13 @@ services:
     networks:
       - backend
 
+####VOLUMES####
 volumes:
   cache:
     driver: local
   pgdata:
 
+####NETWORKS####
 networks:
   backend:
     driver: bridge
