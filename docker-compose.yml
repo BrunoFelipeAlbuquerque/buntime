@@ -2,7 +2,8 @@ version: '3.9'
 name: virtual
 services:
   code:
-    container_name: virtual-code
+    container_name: bun
+    hostname: bun
     build:
       dockerfile: ./bun/Dockerfile
     ports:
@@ -10,14 +11,15 @@ services:
     networks:
       - backend
   database:
-    container_name: virtual-database
+    container_name: postgresql
+    hostname: postgresql
     build:
       dockerfile: ./postgresql/Dockerfile
     restart: always
     environment:
-      - PGUSER=${POSTGRES_USER}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGUSER=$POSTGRES_USER
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p 5432"]
       interval: 5s
@@ -31,13 +33,14 @@ services:
       - code
     networks:
       - backend
-  dbms:
-    container_name: virtual-dbms
-    image: dpage/pgadmin4:8.3
+  database-gui:
+    container_name: pgadmin
+    hostname: pgadmin
+    image: dpage/pgadmin4:latest
     restart: always
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_DEFAULT_EMAIL=$PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_DEFAULT_PASSWORD
       - PGADMIN_LISTEN_PORT=5050
     ports:
       - "5050:5050"
@@ -46,7 +49,9 @@ services:
     networks:
       - backend
   cache:
-    image: redis:latest
+    container_name: redis
+    hostname: redis
+    image: redis:7.2
     restart: always
     ports:
       - "6379:6379"
@@ -54,10 +59,26 @@ services:
       - /path/to/local/data:/root/redis
       - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_DATABASES=${REDIS_DATABASES}
-        
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - REDIS_PORT=$REDIS_PORT
+      - REDIS_DATABASES=$REDIS_DATABASES
+    networks:
+      - backend
+  cache-gui:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    build: .
+    restart: always
+    environment:
+    - REDIS_HOSTS=$REDIS_HOSTS
+    ports:
+    - 8081:8081
+    depends_on:
+      - cache
+    networks:
+      - backend
+
 volumes:
   cache:
     driver: local
