@@ -1,14 +1,68 @@
 version: '3.9'
 name: virtual
 services:
-  bun:
-    container_name: virtual-bun
+  code:
+    container_name: virtual-code
     build:
       dockerfile: ./bun/Dockerfile
     ports:
       - 8080:8080
     networks:
       - backend
+  database:
+    container_name: virtual-database
+    build:
+      dockerfile: ./postgresql/Dockerfile
+    restart: always
+    environment:
+      - PGUSER=${POSTGRES_USER}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    depends_on:
+      - code
+    networks:
+      - backend
+  dbms:
+    container_name: virtual-dbms
+    image: dpage/pgadmin4:8.3
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - "5050:5050"
+    depends_on:
+      - database
+    networks:
+      - backend
+  cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /path/to/local/data:/root/redis
+      - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DATABASES=${REDIS_DATABASES}
+        
+volumes:
+  cache:
+    driver: local
+  pgdata:
+
 networks:
   backend:
     driver: bridge
