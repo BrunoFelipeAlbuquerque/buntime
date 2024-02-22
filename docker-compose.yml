@@ -98,6 +98,11 @@ services:
       - REDIS_PASSWORD=$REDIS_PASSWORD
       - REDIS_PORT=$REDIS_PORT
       - REDIS_DATABASES=$REDIS_DATABASES
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 2
+      timeout: 5s
     networks:
       - backend
 
@@ -114,11 +119,6 @@ services:
         window: 180s
     environment:
     - REDIS_HOSTS=$REDIS_HOSTS
-    healthcheck:
-        test: curl --fail http://localhost:8080 || exit 1
-        interval: 5s
-        retries: 2
-        timeout: 5s
     ports:
     - 8081:8081
     depends_on:
