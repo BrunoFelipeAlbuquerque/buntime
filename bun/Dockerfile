@@ -11,7 +11,7 @@ RUN bun install
 
 COPY bun/app/ .
 
-EXPOSE 8080/tcp
+EXPOSE 8080
 
-CMD [ "bun", "run", "server.ts" ]
+CMD [ "bun", "run", "app.ts" ]
  

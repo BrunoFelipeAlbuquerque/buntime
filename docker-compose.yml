@@ -3,21 +3,33 @@ name: virtual
 services:
   ####SERVICE####
   code:
-    container_name: bun
-    hostname: bun
+    container_name: code
     build:
       dockerfile: ./bun/Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
     cpus: $AWS_T3_NANO_CPUS
     ports:
-      - 8080:8080
+      - 8080
     networks:
       - backend
 
   ####SERVICE####
+  proxy:
+    container_name: proxy
+    image: nginx:1.25
+    ports:
+      - "80:80"
+    volumes:
+      - ./bun/app:/var/www/html
+      - ./infrastructure/nginx:/etc/nginx/conf.d
+    networks:
+      - backend
+    depends_on:
+      - code
+
+  ####SERVICE####
   database:
-    container_name: postgresql
-    hostname: postgresql
+    container_name: database
     build:
       dockerfile: ./postgresql/Dockerfile
     environment:
@@ -48,8 +60,7 @@ services:
 
   ####SERVICE####
   database-gui:
-    container_name: pgadmin
-    hostname: pgadmin
+    container_name: database-gui
     image: dpage/pgadmin4:latest
     deploy:
       restart_policy:
@@ -70,8 +81,7 @@ services:
 
   ####SERVICE####
   cache:
-    container_name: redis
-    hostname: redis
+    container_name: cache
     image: redis:7.2
     deploy:
       restart_policy:
@@ -93,8 +103,7 @@ services:
 
   ####SERVICE####
   cache-gui:
-    container_name: redis-commander
-    hostname: redis-commander
+    container_name: cache-gui
     image: rediscommander/redis-commander:latest
     build: .
     deploy:
@@ -105,6 +114,11 @@ services:
         window: 180s
     environment:
     - REDIS_HOSTS=$REDIS_HOSTS
+    healthcheck:
+        test: curl --fail http://localhost:8080 || exit 1
+        interval: 5s
+        retries: 2
+        timeout: 5s
     ports:
     - 8081:8081
     depends_on:
