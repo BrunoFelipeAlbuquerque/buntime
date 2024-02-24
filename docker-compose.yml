@@ -1,9 +1,12 @@
 version: '3.9'
 name: virtual
 services:
-  ####SERVICE####
+  #############################
+  # CODE
+  #############################
   code:
     container_name: code
+    domainname: $CODE_DOMAIN
     build:
       dockerfile: ./bun/Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
@@ -13,9 +16,12 @@ services:
     networks:
       - backend
 
-  ####SERVICE####
+  #############################
+  # PROXY
+  #############################
   proxy:
     container_name: proxy
+    domainname: $PROXY_DOMAIN
     image: nginx:1.25
     ports:
       - "80:80"
@@ -27,9 +33,12 @@ services:
     depends_on:
       - code
 
-  ####SERVICE####
+  #############################
+  # DATABASE
+  #############################
   database:
     container_name: database
+    domainname: $DATABASE_DOMAIN
     build:
       dockerfile: ./postgresql/Dockerfile
     environment:
@@ -58,9 +67,12 @@ services:
     networks:
       - backend
 
-  ####SERVICE####
+  #############################
+  # DATABASE GUI
+  #############################
   database-gui:
     container_name: database-gui
+    domainname: $DATABASE_GUI_DOMAIN
     image: dpage/pgadmin4:latest
     deploy:
       restart_policy:
@@ -79,9 +91,12 @@ services:
     networks:
       - backend
 
-  ####SERVICE####
+  #############################
+  # CACHE
+  #############################
   cache:
     container_name: cache
+    domainname: $CACHE_DOMAIN
     image: redis:7.2
     deploy:
       restart_policy:
@@ -106,9 +121,12 @@ services:
     networks:
       - backend
 
-  ####SERVICE####
+  #############################
+  # CACHE-GUI
+  #############################
   cache-gui:
     container_name: cache-gui
+    domainname: $CACHE_GUI_DOMAIN
     image: rediscommander/redis-commander:latest
     build: .
     deploy:
@@ -126,13 +144,17 @@ services:
     networks:
       - backend
 
-####VOLUMES####
+#############################
+# VOLUMES
+#############################
 volumes:
   cache:
     driver: local
   pgdata:
 
-####NETWORKS####
+#############################
+# NETWORKS
+#############################
 networks:
   backend:
     driver: bridge

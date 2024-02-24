@@ -13,5 +13,5 @@ COPY bun/app/ .
 
 EXPOSE 8080
 
-CMD [ "bun", "run", "app.ts" ]
+CMD [ "bun", "--hot run", "app.ts" ]
  
