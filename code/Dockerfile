@@ -5,11 +5,11 @@ LABEL description="Bun Runtime Enviroment"
 
 WORKDIR /usr/src/buntime
 
-COPY bun/app/package.json .
+COPY code/app/package.json .
 
 RUN bun install
 
-COPY bun/app/ .
+COPY code/app/ .
 
 EXPOSE 8080
 

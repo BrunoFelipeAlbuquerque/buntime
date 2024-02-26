@@ -8,7 +8,7 @@ services:
     container_name: code
     domainname: $CODE_DOMAIN
     build:
-      dockerfile: ./bun/Dockerfile
+      dockerfile: ./code/Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
     cpus: $AWS_T3_NANO_CPUS
     ports:
@@ -26,7 +26,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./bun/app:/var/www/html
+      - ./code/app:/var/www/html
       - ./infrastructure/nginx:/etc/nginx/conf.d
     networks:
       - backend
