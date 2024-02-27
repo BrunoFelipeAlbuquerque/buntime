@@ -8,7 +8,7 @@ services:
     container_name: code
     domainname: $CODE_DOMAIN
     build:
-      dockerfile: ./code/Dockerfile
+      dockerfile: ./Code-Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
     cpus: $AWS_T3_NANO_CPUS
     ports:
@@ -26,11 +26,13 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./code/app:/var/www/html
+      - ./:/var/www/html
       - ./infrastructure/nginx:/etc/nginx/conf.d
     networks:
       - backend
     depends_on:
+      - code
+    links:
       - code
 
   #############################
@@ -40,7 +42,7 @@ services:
     container_name: database
     domainname: $DATABASE_DOMAIN
     build:
-      dockerfile: ./postgresql/Dockerfile
+      dockerfile: ./Database-Dockerfile
     environment:
       - PGUSER=$POSTGRES_USER
       - POSTGRES_USER=$POSTGRES_USER
@@ -107,8 +109,8 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - /path/to/local/data:/root/redis
-      - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
+      - /cache:/root/redis
+      - /cache/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
       - REDIS_PASSWORD=$REDIS_PASSWORD
       - REDIS_PORT=$REDIS_PORT
