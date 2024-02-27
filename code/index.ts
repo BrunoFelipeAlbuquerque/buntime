@@ -1,8 +1,12 @@
-const server = Bun.serve({
-    port: 8080,
-    fetch(req) {
-      return new Response("Bun!");
-    },
-  });
-  
-  console.log(`Listening on http://localhost:${server.port} ...`);
+import express from "express";
+
+const app = express();
+const port = 8080;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Listening on port ${port}...`);
+});

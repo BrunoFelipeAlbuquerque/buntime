@@ -3,6 +3,9 @@
 FROM oven/bun:1 as base
 WORKDIR /usr/src/app
 
+# adding project dependencies
+RUN bun add express
+
 # install dependencies into temp directory
 # this will cache them and speed up future builds
 FROM base AS install
@@ -35,4 +38,5 @@ COPY --from=prerelease /usr/src/app/code/package.json .
 # run the app
 USER bun
 EXPOSE 8080
+
 ENTRYPOINT [ "bun", "run", "index.ts" ]
