@@ -8,9 +8,9 @@ services:
     container_name: code
     domainname: $CODE_DOMAIN
     build:
-      dockerfile: ./Code-Dockerfile
+      dockerfile: ./code/Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
-    cpus: $AWS_T3_NANO_CPUS
+    cpus: $AWS_T3_NANO_CPUS 
     ports:
       - 8080
     networks:
@@ -42,7 +42,7 @@ services:
     container_name: database
     domainname: $DATABASE_DOMAIN
     build:
-      dockerfile: ./Database-Dockerfile
+      dockerfile: ./database/Dockerfile
     environment:
       - PGUSER=$POSTGRES_USER
       - POSTGRES_USER=$POSTGRES_USER
