@@ -146,6 +146,34 @@ services:
     networks:
       - backend
 
+  #############################
+  # EVENT-STORE-MANAGER
+  #############################   
+  event-store-manager:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: $ZOOKEEPER_CLIENT_PORT
+      ZOOKEEPER_TICK_TIME: $ZOOKEEPER_TICK_TIME
+    ports:
+      - 22181:2181
+
+  #############################
+  # EVENT-STORE
+  #############################   
+  event-store:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      - event-store-manager
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: $KAFKA_BROKER_ID
+      KAFKA_ZOOKEEPER_CONNECT: $KAFKA_ZOOKEEPER_CONNECT
+      KAFKA_ADVERTISED_LISTENERS: $KAFKA_ADVERTISED_LISTENERS
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: $KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+      KAFKA_INTER_BROKER_LISTENER_NAME: $KAFKA_INTER_BROKER_LISTENER_NAME
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: $KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+
 #############################
 # VOLUMES
 #############################
