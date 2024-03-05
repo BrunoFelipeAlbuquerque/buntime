@@ -21,7 +21,6 @@ services:
   #############################
   proxy:
     container_name: proxy
-    domainname: $PROXY_DOMAIN
     image: nginx:1.25
     ports:
       - 80:80
@@ -40,7 +39,6 @@ services:
   #############################
   database:
     container_name: database
-    domainname: $DATABASE_DOMAIN
     build:
       dockerfile: ./database/Dockerfile
     environment:
@@ -98,7 +96,6 @@ services:
   #############################
   cache:
     container_name: cache
-    domainname: $CACHE_DOMAIN
     image: redis:7.2
     deploy:
       restart_policy:
@@ -151,7 +148,6 @@ services:
   #############################   
   event-store-manager:
     container_name: event-store-manager
-    domainname: $EVENT_STORE_MANAGER_DOMAIN
     image: confluentinc/cp-zookeeper:7.6.0
     environment:
       ZOOKEEPER_CLIENT_PORT: $ZOOKEEPER_CLIENT_PORT
@@ -164,7 +160,6 @@ services:
   #############################   
   event-store:
     container_name: event-store
-    domainname: $EVENT_STORE_DOMAIN
     image: confluentinc/cp-kafka:7.6.0
     depends_on:
       - event-store-manager
@@ -193,6 +188,8 @@ services:
       KAFKA_CLUSTERS_0_NAME: $KAFKA_CLUSTERS_0_NAME
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: $KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
       KAFKA_CLUSTERS_0_ZOOKEEPER: $KAFKA_CLUSTERS_0_ZOOKEEPER
+    networks:
+      - backend
 
 #############################
 # VOLUMES
