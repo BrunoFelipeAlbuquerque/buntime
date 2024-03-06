@@ -1,7 +1,7 @@
-#BUNTIME
+# BUNTIME
 This project was created using `bun init` in bun v1.0.20. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
 
-##THE STACK
+## THE STACK
 ```
 Bun
 Nginx
@@ -18,7 +18,7 @@ Zookeeper
 All to made easier to create **Event Driven** software.
 
 
-##HOW TO RUN
+## HOW TO RUN
 Add the following to ```hosts``` file:
 
 ```
