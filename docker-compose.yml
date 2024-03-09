@@ -39,8 +39,7 @@ services:
   #############################
   database:
     container_name: database
-    build:
-      dockerfile: ./database/Dockerfile
+    image: postgres:16.1
     environment:
       - PGUSER=$POSTGRES_USER
       - POSTGRES_USER=$POSTGRES_USER
@@ -60,6 +59,7 @@ services:
         window: 120s
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./database/setup_script.sql:/docker-entrypoint-initdb.d/setup_script.sql
     ports:
       - 5432:5432
     depends_on:

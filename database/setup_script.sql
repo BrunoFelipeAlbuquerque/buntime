@@ -1,10 +1,12 @@
-CREATE DATABASE commander_showdown;
+CREATE USER {{POSTGRES_USER}} WITH SUPERUSER PASSWORD '{{POSTGRES_PASSWORD}}';
 
-CREATE TYPE role AS ENUM ('Player', 'Organizer', 'Administrator');
+CREATE SCHEMA commander_showdown;
 
-CREATE TABLE users (
+CREATE TYPE commander_showdown.role AS ENUM ('Player', 'Organizer', 'Administrator');
+
+CREATE TABLE commander_showdown.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    role ROLE DEFAULT 'Player',
+    role commander_showdown.ROLE DEFAULT 'Player',
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255),
@@ -15,19 +17,19 @@ CREATE TABLE users (
     deleted_at TIMESTAMP DEFAULT NULL
 );
 
-INSERT INTO users (id, username, email) VALUES (
+INSERT INTO commander_showdown.users (role, username, email, password) VALUES (
     'Administrator',
     'Administrator',
     '{{ADMIN_EMAIL}}',
     '{{ADMIN_PASSWORD}}' 
 );
 
-CREATE TYPE game AS ENUM ('Magic the Gathering');
+CREATE TYPE commander_showdown.game AS ENUM ('Magic the Gathering');
 
-CREATE TABLE decks (
+CREATE TABLE commander_showdown.decks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id),
-    game GAME DEFAULT 'Magic the Gathering',
+    user_id UUID NOT NULL REFERENCES commander_showdown.users(id),
+    game commander_showdown.GAME DEFAULT 'Magic the Gathering',
     name VARCHAR(255) NOT NULL,
     link VARCHAR(255) NOT NULL,
     description VARCHAR(255),
@@ -36,12 +38,12 @@ CREATE TABLE decks (
     deleted_at TIMESTAMP DEFAULT NULL
 );
 
-CREATE TYPE event_status AS ENUM ('Upcoming', 'Ongoing', 'Ended');
+CREATE TYPE commander_showdown.event_status AS ENUM ('Upcoming', 'Ongoing', 'Ended');
 
-CREATE TABLE events (
+CREATE TABLE commander_showdown.events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id),
-    game GAME DEFAULT 'Magic the Gathering',
+    user_id UUID NOT NULL REFERENCES commander_showdown.users(id),
+    game commander_showdown.GAME DEFAULT 'Magic the Gathering',
     name VARCHAR(255) NOT NULL,
     link VARCHAR(255) NOT NULL,
     description VARCHAR(255),
@@ -49,16 +51,16 @@ CREATE TABLE events (
     rounds INT DEFAULT 1,
     start_date DATE NOT NULL,
     end_date DATE,
-    event_status EVENT_STATUS DEFAULT 'Upcoming',
+    event_status commander_showdown.EVENT_STATUS DEFAULT 'Upcoming',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE users_events (
-    user_id UUID NOT NULL REFERENCES users(id),
-    event_id UUID NOT NULL REFERENCES events(id),
-    deck_id UUID NOT NULL REFERENCES decks(id),
+CREATE TABLE commander_showdown.users_events (
+    user_id UUID NOT NULL REFERENCES commander_showdown.users(id),
+    event_id UUID NOT NULL REFERENCES commander_showdown.events(id),
+    deck_id UUID NOT NULL REFERENCES commander_showdown.decks(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, event_id)
