@@ -14,6 +14,9 @@ setup:
 	@sed -i 's/{{POSTGRES_PASSWORD}}/${POSTGRES_PASSWORD}/g' .env
 	@sed -i 's/{{REDIS_PASSWORD}}/${REDIS_PASSWORD}/g' .env
 
+	@curl -fsSL https://bun.sh/install | bash
+
+	@bun install
 	@bun run ./database/setup.ts
 
 start:
