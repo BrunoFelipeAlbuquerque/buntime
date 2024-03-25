@@ -1,20 +1,15 @@
 {
-  "name": "buntime",
-  "module": "index.ts",
-  "type": "module",
+  "name": "code",
+  "version": "1.0.50",
   "scripts": {
-    "dev": "bun --hot index.ts"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch index.ts"
   },
   "dependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "bcrypt": "^5.1.1",
-    "express": "^4.18.3",
-    "fs": "^0.0.1-security"
-  }
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "module": "index.js"
 }
