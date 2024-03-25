@@ -1,4 +1,4 @@
-CREATE USER {{POSTGRES_USER}} WITH SUPERUSER PASSWORD '{{POSTGRES_PASSWORD}}';
+CREATE USER postgres WITH SUPERUSER PASSWORD 'postgres';
 
 CREATE SCHEMA commander_showdown;
 
@@ -20,8 +20,8 @@ CREATE TABLE commander_showdown.users (
 INSERT INTO commander_showdown.users (role, username, email, password) VALUES (
     'Administrator',
     'Administrator',
-    '{{ADMIN_EMAIL}}',
-    '{{ADMIN_PASSWORD}}' 
+    'admin@email.com',
+    '$2b$10$opO4/5eBP2aKY0DyE6BvKeKSKNB.XiRC/NHYZHAAvwCNI89qUWgo.' 
 );
 
 CREATE TYPE commander_showdown.game AS ENUM ('Magic the Gathering');

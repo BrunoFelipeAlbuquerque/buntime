@@ -6,11 +6,13 @@ services:
   #############################
   code:
     container_name: code
-    domainname: $CODE_DOMAIN
     build:
       dockerfile: ./code/Dockerfile
     mem_limit: $AWS_T3_NANO_MEMORY_LIMIT
-    cpus: $AWS_T3_NANO_CPUS 
+    cpus: $AWS_T3_NANO_CPUS
+    volumes:
+      - ./code:/code
+      - node_modules:/usr/src/app/node_modules
     ports:
       - 8080
     networks:
@@ -25,10 +27,15 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./:/var/www/html
       - ./infrastructure/nginx:/etc/nginx/conf.d
     depends_on:
       - code
+      - database
+      - database-gui
+      - cache
+      - cache-gui
+      - event-store
+      - event-store-gui
     links:
       - code
     networks:
@@ -72,7 +79,6 @@ services:
   #############################
   database-gui:
     container_name: database-gui
-    domainname: $DATABASE_GUI_DOMAIN
     image: dpage/pgadmin4:latest
     deploy:
       restart_policy:
@@ -125,7 +131,6 @@ services:
   #############################
   cache-gui:
     container_name: cache-gui
-    domainname: $CACHE_GUI_DOMAIN
     image: rediscommander/redis-commander:latest
     build: .
     deploy:
@@ -181,7 +186,6 @@ services:
   #############################   
   event-store-gui:
     container_name: event-store-gui
-    domainname: $EVENT_STORE_GUI_DOMAIN
     image: provectuslabs/kafka-ui:latest
     depends_on:
       - event-store
@@ -202,6 +206,7 @@ volumes:
   cache:
     driver: local
   pgdata:
+  node_modules:
 
 #############################
 # NETWORKS

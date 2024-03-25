@@ -1,10 +1,8 @@
-import dotenv from 'dotenv';
 import fs from 'fs';
 import * as bcrypt from 'bcrypt';
 
 const saltRounds = 10;
 console.log('Starting setup.ts...');
-dotenv.config();
 
 let email: string = process.env.ADMIN_EMAIL as string;
 let password: string = process.env.ADMIN_PASSWORD as string;
@@ -16,7 +14,7 @@ console.log(`Administrator password set to: ${password}`);
 console.log('Setting up database script...');
 
 bcrypt.hash(password, saltRounds, function(__, hashed_password) {
-  const content = fs.readFileSync('./database/setup_script.sql', {
+  const content = fs.readFileSync('./database/base_setup_script.sql', {
       encoding: 'utf8',
       flag: 'r',
     }).toString()
